@@ -3,11 +3,11 @@ name: Test Workflow
 on: 
   workflow_dispatch:
     inputs:
-      logLevel:
+      secretName:
         description: 'Secret Name'     
         required: true
         default: 'warning'
-      tags:
+      serviceName:
         description: 'CloudRun Service Name'
         required: true
 
@@ -21,6 +21,6 @@ jobs:
       - name: Run tests
         run: |
           # Use logLevel and tags variables
-          echo "Running tests with log level: ${{ inputs.logLevel }}"
-          echo "Using tags: ${{ inputs.tags }}"
+          echo "Running tests with log level: ${{ inputs.secretName }}"
+          echo "Using tags: ${{ inputs.serviceName }}"
 
