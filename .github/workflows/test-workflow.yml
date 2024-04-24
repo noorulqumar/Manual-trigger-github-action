@@ -7,3 +7,17 @@ on:
         default: 'warning'
       tags:
         description: 'Test scenario tags' 
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          # Use logLevel and tags variables
+          echo "Running tests with log level: ${{ inputs.logLevel }}"
+          echo "Using tags: ${{ inputs.tags }}"
+
