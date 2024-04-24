@@ -29,5 +29,5 @@ jobs:
           # Use logLevel and tags variables
           echo "Running tests with log level: ${{ inputs.secretName }}"
           echo "Using tags: ${{ inputs.serviceName }}"
-          echo "Using tags: ${{ tag }}"
+          echo "Using tags: ${tag}"
 
