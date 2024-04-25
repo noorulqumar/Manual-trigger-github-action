@@ -58,5 +58,5 @@ jobs:
               --region europe-west1 \
               --project qureos-a1006 \
               --image europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} \
-              --port PORT_NUMBER \
+              --port 80 \
               --allow-unauthenticated
