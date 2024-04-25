@@ -46,3 +46,17 @@ jobs:
              gsutil cp gs://qureos-envs/backend/stg-1/.env .
           fi
 
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile.prod .
+          docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
+
+      - name: Deploy to Cloud Run
+        run: |
+            gcloud run deploy ${{ inputs.serviceName }} \
+              --region europe-west1 \
+              --project qureos-a1006 \
+              --image europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} \
+              --port PORT_NUMBER \
+              --allow-unauthenticated
