@@ -63,7 +63,7 @@ jobs:
 
       - name: Create Domain Mapping
         run: |
-            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --quiet
+            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --non-interactive
 
       - name: Update DNS Record
         run: |
