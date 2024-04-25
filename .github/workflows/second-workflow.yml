@@ -34,6 +34,7 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project qureos-a1006
 
 
       - name: Fetch env file from GCS
@@ -69,7 +70,6 @@ jobs:
 
       - name: Update DNS Record
         run: |
-         gcloud config set project qureos-a1006
          gcloud dns record-sets transaction start --zone=qureos-com
          gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
          gcloud dns record-sets transaction execute --zone=qureos-com 
