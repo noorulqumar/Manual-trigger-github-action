@@ -60,3 +60,12 @@ jobs:
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
               --allow-unauthenticated
+
+      - name: Create Domain Mapping
+        run: |
+            gcloud run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }}
+      - name: Update DNS Record
+        run: |
+         gcloud dns record-sets transaction start --zone=qureos-com
+         gcloud dns record-sets transaction add --name=${{ inputs.domainName }} --type=CNAME --ttl=300 --cname=ghs.googlehosted.com.
+         gcloud dns record-sets transaction execute      
