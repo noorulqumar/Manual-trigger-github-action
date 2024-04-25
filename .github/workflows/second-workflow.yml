@@ -63,7 +63,8 @@ jobs:
 
       - name: Create Domain Mapping
         run: |
-            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }}
+            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --quiet
+
       - name: Update DNS Record
         run: |
          gcloud dns record-sets transaction start --zone=qureos-com
