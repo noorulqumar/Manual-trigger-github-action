@@ -49,7 +49,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile.prod .
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
           docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
 
       - name: Deploy to Cloud Run
