@@ -57,6 +57,6 @@ jobs:
             gcloud run deploy ${{ inputs.serviceName }} \
               --region europe-west1 \
               --project qureos-a1006 \
-              --image europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} \
+              --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 80 \
               --allow-unauthenticated
