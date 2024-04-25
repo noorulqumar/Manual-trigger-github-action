@@ -1,0 +1,48 @@
+name: ManualWorkflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      secretName:
+        type: choice
+        description: 'Select Secret Name' 
+        options: ["api-v3-prod", "api-v3-stg", "api-v3-stg-1"]
+
+      serviceName:
+        description: 'CloudRun Service Name'
+        required: true
+      domainName:
+        description: 'Domain Name'
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+
+
+      - name: Fetch env file from GCS
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            gsutil cp gs://qureos-envs/backend/prod/.env .
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            gsutil cp gs://qureos-envs/backend/staging/.env .
+          else
+             gsutil cp gs://qureos-envs/backend/stg-1/.env .
+          fi
+
