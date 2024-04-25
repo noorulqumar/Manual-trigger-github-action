@@ -58,5 +58,5 @@ jobs:
               --region europe-west1 \
               --project qureos-a1006 \
               --image us-docker.pkg.dev/cloudrun/container/hello \
-              --port 80 \
+              --port 8080 \
               --allow-unauthenticated
