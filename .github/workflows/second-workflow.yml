@@ -66,9 +66,9 @@ jobs:
       - name: Create Domain Mapping
         run: |
             gcloud domains verify qureos.com
-      #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      #       #gcloud components update
-      #       gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
+            export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+            #gcloud components update
+            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
 
       # - name: Update DNS Record
       #   run: |
