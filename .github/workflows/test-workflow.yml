@@ -5,15 +5,9 @@ on:
     inputs:
       choice:
         type: choice
-        description: Make a choice
-        options:
-        - foo
-        - bar
-        - baz
-      secretName:
-        description: 'Secret Name'     
-        required: true
+        description: 'Select Secret Name' 
         options: ["api-v3-prod", "api-v3-stg", "api-v3-stg-1"]
+
       serviceName:
         description: 'CloudRun Service Name'
         required: true
