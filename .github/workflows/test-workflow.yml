@@ -3,6 +3,13 @@ name: Test Workflow
 on: 
   workflow_dispatch:
     inputs:
+      choice:
+        type: choice
+        description: Make a choice
+        options:
+        - foo
+        - bar
+        - baz
       secretName:
         description: 'Secret Name'     
         required: true
