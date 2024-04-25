@@ -3,7 +3,7 @@ name: Test Workflow
 on: 
   workflow_dispatch:
     inputs:
-      choice:
+      secretName:
         type: choice
         description: 'Select Secret Name' 
         options: ["api-v3-prod", "api-v3-stg", "api-v3-stg-1"]
