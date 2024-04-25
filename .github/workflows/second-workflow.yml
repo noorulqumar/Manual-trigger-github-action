@@ -64,8 +64,8 @@ jobs:
       - name: Create Domain Mapping
         run: |
             export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-            gcloud components update
-            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --non-interactive
+            #gcloud components update
+            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} 
 
       - name: Update DNS Record
         run: |
