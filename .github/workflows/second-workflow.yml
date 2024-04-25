@@ -71,5 +71,5 @@ jobs:
         run: |
          gcloud config set project qureos-a1006
          gcloud dns record-sets transaction start --zone=qureos-com
-         gcloud dns record-sets transaction add --name=${{ inputs.domainName }} --type=CNAME --ttl=300 --cname=ghs.googlehosted.com.
+         gcloud dns record-sets transaction add --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 --rdata="ghs.googlehosted.com."
          gcloud dns record-sets transaction execute      
