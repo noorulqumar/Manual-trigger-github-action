@@ -47,6 +47,7 @@ jobs:
              gsutil cp gs://qureos-envs/backend/stg-1/.env .
           fi
 
+
       # - name: Build and Push Docker Image
       #   run: |
       #     gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
@@ -62,14 +63,15 @@ jobs:
               --port 8080 \
               --allow-unauthenticated
 
-      # - name: Create Domain Mapping
-      #   run: |
+      - name: Create Domain Mapping
+        run: |
+            gcloud domains verify qureos.com
       #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
       #       #gcloud components update
       #       gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
 
-      - name: Update DNS Record
-        run: |
-         gcloud dns record-sets transaction start --zone=qureos-com
-         gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
-         gcloud dns record-sets transaction execute --zone=qureos-com 
+      # - name: Update DNS Record
+      #   run: |
+      #    gcloud dns record-sets transaction start --zone=qureos-com
+      #    gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
+      #    gcloud dns record-sets transaction execute --zone=qureos-com 
