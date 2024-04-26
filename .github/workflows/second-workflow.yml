@@ -65,9 +65,29 @@ jobs:
 
       - name: Update DNS Record
         run: |
-         gcloud dns record-sets transaction start --zone=qureos-com
-         gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
-         gcloud dns record-sets transaction execute --zone=qureos-com 
+
+         ZONE="qureos-com"
+         RECORD_NAME="${{ inputs.domainName }}"
+         RECORD_TYPE="CNAME"
+         RECORD_VALUE="ghs.googlehosted.com."
+         TTL="300"
+         # Check if the record exists
+         existing_record=$(gcloud dns record-sets describe "$RECORD_NAME" --type="$RECORD_TYPE" --zone="$ZONE" --format="value(name)" 2>/dev/null)
+         # If the record already exists, exit
+         test = 0
+         if [ "$existing_record" = "$RECORD_NAME." ]; then
+            echo "Record $RECORD_NAME already exists. Skipping."
+            test = 1
+         fi
+        
+         if [[ $test == 1 ]]; then
+           # If the record doesn't exist, add it
+           echo "Adding record $RECORD_NAME..."
+           gcloud dns record-sets transaction start --zone="$ZONE"
+           gcloud dns record-sets transaction add --zone="$ZONE" --name="$RECORD_NAME" --type="$RECORD_TYPE" --ttl="$TTL" "$RECORD_VALUE"
+           gcloud dns record-sets transaction execute --zone="$ZONE"
+           echo "Record $RECORD_NAME added successfully."
+         fi
 
       - name: Create Domain Mapping
         run: |
