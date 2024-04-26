@@ -63,6 +63,12 @@ jobs:
               --port 8080 \
               --allow-unauthenticated
 
+      - name: Update DNS Record
+        run: |
+         gcloud dns record-sets transaction start --zone=qureos-com
+         gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
+         gcloud dns record-sets transaction execute --zone=qureos-com 
+
       - name: Create Domain Mapping
         run: |
             #gcloud domains verify qureos.com
@@ -70,8 +76,4 @@ jobs:
             #gcloud components update
             gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
 
-      # - name: Update DNS Record
-      #   run: |
-      #    gcloud dns record-sets transaction start --zone=qureos-com
-      #    gcloud dns record-sets transaction add --zone=qureos-com --name="${{ inputs.domainName }}" --type=CNAME --ttl=300 "ghs.googlehosted.com."
-      #    gcloud dns record-sets transaction execute --zone=qureos-com 
+     
