@@ -85,12 +85,17 @@ jobs:
             echo "Record $RECORD_NAME added successfully."
           fi
 
-
-      - name: Create Domain Mapping
+      - name: Get Service URL
         run: |
-            #gcloud domains verify qureos.com
-            export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-            #gcloud components update
-            gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
+          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project qureos-a1006 --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+
+          
+      # - name: Create Domain Mapping
+      #   run: |
+      #       #gcloud domains verify qureos.com
+      #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      #       #gcloud components update
+      #       gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
 
      
