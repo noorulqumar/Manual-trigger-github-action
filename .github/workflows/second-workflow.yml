@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
-          gcloud config set project qureos-a1006
+          gcloud config set project ${{ env.GOOGLE_PROJECT }}
 
 
       - name: Fetch env file from GCS
@@ -48,17 +48,17 @@ jobs:
           fi
 
 
-      # - name: Build and Push Docker Image
-      #   run: |
-      #     gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-      #     docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
-      #     docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build -t europe-west1-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/workflow/workflow:${{ env.tag }} -f Dockerfile .
+          docker push europe-west1-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/workflow/workflow:${{ env.tag }}
 
       - name: Deploy to Cloud Run
         run: |
             gcloud run deploy ${{ inputs.serviceName }} \
               --region europe-west1 \
-              --project qureos-a1006 \
+              --project ${{ env.GOOGLE_PROJECT }} \
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
               --allow-unauthenticated
@@ -87,7 +87,7 @@ jobs:
 
       - name: Get Service URL
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project qureos-a1006 --format 'value(status.url)')
+          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project ${{ env.GOOGLE_PROJECT }} --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
 
           
