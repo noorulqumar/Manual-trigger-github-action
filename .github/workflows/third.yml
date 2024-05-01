@@ -44,8 +44,8 @@ jobs:
       - name: Check Cloud Run service with provided name exists
         id: check_service
         run: |
-          service_name="${{ github.event.inputs.serviceName }}"
-          if gcloud run services list --platform=managed | grep -q "${{service_name}}-API_V3"; then
+          "${{ github.event.inputs.serviceName }}-API_V3"
+          if gcloud run services list --platform=managed | grep -q $service_name; then
            echo "Service with the Provided Name already Exist"
            exit 0
           else 
