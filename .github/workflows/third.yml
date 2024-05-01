@@ -15,6 +15,7 @@ on:
       serviceName:
         description: 'CloudRun Service Name'
         required: true
+        default: ${GITHUB_REF}
       
 jobs:
   Create:
