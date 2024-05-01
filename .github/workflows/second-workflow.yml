@@ -101,20 +101,6 @@ jobs:
             echo "Record $RECORD_NAME added successfully."
           fi
         
-      # - name: Update DNS Record
-      #   run: |
-      #     existing_record=$(gcloud dns record-sets describe "${{ inputs.domainName }}" --type="CNAME" --zone="$ZONE" --format="value(name)" 2>/dev/null)
-      #     if [[ "$existing_record" = "${{ inputs.domainName }}" ]]; then
-      #       echo "Record "${{ inputs.domainName }}" already exists. Skipping."
-      #     else
-      #       # If the record doesn't exist, add it
-      #       echo "Adding record $RECORD_NAME..."
-      #       gcloud config set project $GOOGLE_PROJECT
-      #       gcloud dns record-sets transaction start --zone="$ZONE"
-      #       gcloud dns record-sets transaction add --zone="$ZONE" --name="${{ inputs.domainName }}" --type="CNAME" --ttl="300" "$RECORD_VALUE"
-      #       gcloud dns record-sets transaction execute --zone="$ZONE"
-      #       echo "Record $RECORD_NAME added successfully."
-          # fi
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
