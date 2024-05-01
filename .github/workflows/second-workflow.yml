@@ -74,7 +74,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
             gcloud run deploy ${{ inputs.serviceName }} \
-              --region europe-west1 \qureos-a1006
+              --region europe-west1 \
               --project $GOOGLE_PROJECT \
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
