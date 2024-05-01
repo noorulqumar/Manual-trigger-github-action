@@ -73,13 +73,13 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
             gcloud run deploy ${{ inputs.serviceName }} \
-              --region europe-west1 \
-              --project $GOOGLE_PROJECT \
-              --image us-docker.pkg.dev/cloudrun/container/hello \
-              --port 8080 \
-              --allow-unauthenticated
-              --cpu=4 
-              --memory=16Gi
+            --region europe-west1 \
+            --project $GOOGLE_PROJECT \
+            --image us-docker.pkg.dev/cloudrun/container/hello \
+            --port 8080 \
+            --allow-unauthenticated \
+            --cpu=4 \
+            --memory=16Gi
 
 
         
