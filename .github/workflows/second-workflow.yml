@@ -21,6 +21,9 @@ jobs:
       tag: $GITHUB_SHA
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+      ZONE: "qureos-com"
+      RECORD_TYPE: "CNAME"
+      RECORD_VALUE: "ghs.googlehosted.com."
       TTL: "300"
     steps:
       - name: 'Checkout code'
@@ -61,35 +64,31 @@ jobs:
               --allow-unauthenticated
       - name: Update DNS Record
         run: |
-          ZONE="qureos-com"
-          RECORD_NAME="${{ inputs.domainName }}"
-          RECORD_TYPE="CNAME"
-          RECORD_VALUE="ghs.googlehosted.com."
-          TTL="300"
-      
-          # Check if the record exists
-          existing_record=$(gcloud dns record-sets describe "$RECORD_NAME" --type="$RECORD_TYPE" --zone="$ZONE" --format="value(name)" 2>/dev/null)
-      
-          if [[ "$existing_record" = "$RECORD_NAME." ]]; then
-            echo "Record $RECORD_NAME already exists. Skipping."
-          else
-            # If the record doesn't exist, add it
             echo "Adding record $RECORD_NAME..."
             gcloud config set project qureos-a1006
             gcloud dns record-sets transaction start --zone="$ZONE"
             gcloud dns record-sets transaction add --zone="$ZONE" --name="$RECORD_NAME" --type="$RECORD_TYPE" --ttl="$TTL" "$RECORD_VALUE"
             gcloud dns record-sets transaction execute --zone="$ZONE"
             echo "Record $RECORD_NAME added successfully."
-          fi
+          # ZONE="qureos-com"
+          # RECORD_NAME="${{ inputs.domainName }}"
+          # RECORD_TYPE="CNAME"
+          # RECORD_VALUE="ghs.googlehosted.com."
+          # TTL="300"
+      
+          # # Check if the record exists
+          # existing_record=$(gcloud dns record-sets describe "$RECORD_NAME" --type="$RECORD_TYPE" --zone="$ZONE" --format="value(name)" 2>/dev/null)
+      
+          # if [[ "$existing_record" = "$RECORD_NAME." ]]; then
+          #   echo "Record $RECORD_NAME already exists. Skipping."
+          # else
+          #   # If the record doesn't exist, add it
+            
+
 
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project qureos-a1006 --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
           
-      # - name: Create Domain Mapping
-      #   run: |
-      #       #gcloud domains verify qureos.com
-      #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      #       #gcloud components update
-      #       gcloud beta run domain-mappings create --service ${{ inputs.serviceName }} --domain ${{ inputs.domainName }} --region europe-west1 --project qureos-a1006
+     
