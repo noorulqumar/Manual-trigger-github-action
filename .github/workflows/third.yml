@@ -80,7 +80,7 @@ jobs:
             --allow-unauthenticated \
             --cpu=4 \
             --memory=16Gi \
-            --vpc-connector prod-qureos
+            --vpc-connector prod-qureos-vpc-conector
 
 
         
