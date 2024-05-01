@@ -78,6 +78,7 @@ jobs:
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
               --allow-unauthenticated
+              --vpc-connector prod-qureos
 
 
       - name: Update DNS Record
