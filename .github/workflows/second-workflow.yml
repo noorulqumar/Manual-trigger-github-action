@@ -41,7 +41,19 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
-          gcloud config set project $GOOGLE_PROJECT
+          gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Check Cloud Run service with provided name exists
+        id: check_service
+        run: |
+          service_name="${{ github.event.inputs.serviceName }}"
+          existing_service=$(gcloud run services list --platform=managed --format="value(SERVICE)" --filter="SERVICE=$service_name" 2>/dev/null || true)
+          if [[ -n $existing_service ]]; then 
+            echo "Service with the Provided Name already Exist"
+            exit 0
+          else 
+            echo "Service with the Provided Name Does not Exist, Going to Create Service"
+          fi
           
       - name: Fetch env file from GCS
         run: |
