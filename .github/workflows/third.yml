@@ -67,6 +67,28 @@ jobs:
       #     docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
       #     docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
 
+      - name: Fetch env file from GCS
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            gsutil cp gs://qureos-envs/backend/prod/.env .
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            gsutil cp gs://qureos-envs/backend/staging/.env .
+          else
+             gsutil cp gs://qureos-envs/backend/stg-1/.env .
+          fi
+
+      - name: Find the VPC Serverless Connector
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            connector="prod-qureos-vpc-conector"
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            connector="stg-qureos-vpc-conector"
+          else
+             connector="stg-1-qureos-vpc-conector"
+          fi
+          
+          echo "::set-env name=VPC-CONNECTOR::$connector" 
+
       - name: Deploy to Cloud Run
         run: |
             gcloud run deploy ${{ inputs.serviceName }} \
@@ -77,7 +99,7 @@ jobs:
             --allow-unauthenticated \
             --cpu=4 \
             --memory=16Gi \
-            --vpc-connector prod-qureos-vpc-conector
+            --vpc-connector $VPC-CONNECTOR
 
 
         
