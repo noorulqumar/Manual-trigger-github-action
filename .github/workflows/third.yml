@@ -109,7 +109,7 @@ jobs:
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
           gcloud config set project $GOOGLE_PROJECT  
 
-      - name: Check Cloud Run service with provided name exists
+      - name: Check and Delete Cloud Run service if exists
         id: check_service
         run: |
           service_name="${{ github.event.inputs.serviceName }}"
