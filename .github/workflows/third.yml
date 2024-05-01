@@ -86,6 +86,75 @@ jobs:
           SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
 
+  Update:
+    if: github.event.inputs.operationName == 'Update'
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Check Cloud Run service with provided name exists
+        id: check_service
+        run: |
+          service_name="${{ github.event.inputs.serviceName }}"
+          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+           echo "Service with the Provided Name already Exist"
+           exit 0
+          else 
+            echo "Service with the Provided Name Does not Exist, Going to Create Service"
+          fi
+          
+          
+      - name: Fetch env file from GCS
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            gsutil cp gs://qureos-envs/backend/prod/.env .
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            gsutil cp gs://qureos-envs/backend/staging/.env .
+          else
+             gsutil cp gs://qureos-envs/backend/stg-1/.env .
+          fi
+      # - name: Build and Push Docker Image
+      #   run: |
+      #     gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+      #     docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
+      #     docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
+
+      - name: Deploy to Cloud Run
+        run: |
+            gcloud run deploy ${{ inputs.serviceName }} \
+            --region europe-west1 \
+            --project $GOOGLE_PROJECT \
+            --image us-docker.pkg.dev/cloudrun/container/hello \
+            --port 8080 \
+            --allow-unauthenticated \
+            --cpu=4 \
+            --memory=16Gi \
+            --vpc-connector prod-qureos-vpc-conector
+
+
+        
+      - name: Get Service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+          
   Delete:
     if: github.event.inputs.operationName == 'Delete'
     runs-on: ubuntu-20.04
