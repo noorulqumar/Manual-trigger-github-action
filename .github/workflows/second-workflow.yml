@@ -3,6 +3,10 @@ name: Manual Workflow
 on:
   workflow_dispatch:
     inputs:
+      operationName:
+        type: choice
+        description: 'Select Operation' 
+        options: ["Create", "Update", "Delete"]
       secretName:
         type: choice
         description: 'Select Secret Name' 
@@ -15,7 +19,8 @@ on:
         description: 'Domain Name'
         required: true
 jobs:
-  build:
+  Create:
+    if: github.event.inputs.operationName == 'Create'
     runs-on: ubuntu-20.04
     env:
       tag: $GITHUB_SHA
@@ -70,8 +75,6 @@ jobs:
             gcloud dns record-sets transaction execute --zone="$ZONE"
             echo "Record $RECORD_NAME added successfully."
             
-
-
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project qureos-a1006 --format 'value(status.url)')
