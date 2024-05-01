@@ -82,6 +82,7 @@ jobs:
 
       - name: Update DNS Record
         run: |
+          RECORD_NAME="${{ inputs.domainName }}"
           RECORD_TYPE="CNAME"
           RECORD_VALUE="ghs.googlehosted.com."
           TTL="300"
