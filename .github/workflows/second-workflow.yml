@@ -82,7 +82,6 @@ jobs:
 
       - name: Update DNS Record
         run: |
-          ZONE="qureos-com"
           RECORD_NAME="${{ inputs.domainName }}"
           RECORD_TYPE="CNAME"
           RECORD_VALUE="ghs.googlehosted.com."
