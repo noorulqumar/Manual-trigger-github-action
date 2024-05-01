@@ -201,17 +201,16 @@ jobs:
           gcloud config set project $GOOGLE_PROJECT  
 
       - name: Check and Delete Cloud Run service if exists
-        id: check_service
         run: |
           service_name="${{ github.event.inputs.serviceName }}"
           service_name+="-api-v3"
-          echo "Service_Name=$service_name" >> $GITHUB_ENV 
-          if gcloud run services list --platform=managed | grep -q "$Service_Name"; then
-              echo "Service with the Provided Name Exist,Going to Delete It."
-              gcloud run services delete ${{ env.Service_Name }} --platform managed --region europe-west1 --quiet
+          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+              echo "Service with the Provided Name Exist, Going to Delete It."
+              gcloud run services delete $service_name --platform managed --region europe-west1 --quiet
           else 
               echo "Service with the Provided Name Does not Exist"
           fi
+
           
         
           
