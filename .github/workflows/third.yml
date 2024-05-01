@@ -67,7 +67,7 @@ jobs:
 
       - name: Update SITE_URL in .env file
         run: |
-          sed -i "s|SITE_URL=.*|SITE_URL=https://${{ env.Service_Name }}-hbjcr5t7ia-ew.a.run.app|g" .env
+          sed -i "s|SITE_URL=.*|SITE_URL=https://${{ inputs.serviceName }}qureos-hbjcr5t7ia-ew.a.run.app|g" .env
           cat .env
           
       # - name: Build and Push Docker Image
@@ -76,21 +76,12 @@ jobs:
       #     docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
       #     docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
 
-      - name: Fetch env file from GCS
-        run: |
-          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
-            gsutil cp gs://qureos-envs/backend/prod/.env .
-          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
-            gsutil cp gs://qureos-envs/backend/staging/.env .
-          else
-             gsutil cp gs://qureos-envs/backend/stg-1/.env .
-          fi
 
       - name: Find the VPC Serverless Connector
         run: |
-          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
             connector="prod-qureos-vpc-conector"
-          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
             connector="stg-qureos-vpc-conector"
           else
              connector="stg-1-qureos-vpc-conector"
@@ -213,6 +204,8 @@ jobs:
         id: check_service
         run: |
           service_name="${{ github.event.inputs.serviceName }}"
+          service_name+="-api-v3"
+          echo "Service_Name=$service_name" >> $GITHUB_ENV 
           if gcloud run services list --platform=managed | grep -q "$service_name"; then
               echo "Service with the Provided Name Exist,Going to Delete It."
               gcloud run services delete ${{ inputs.serviceName }} --platform managed --region europe-west1 --quiet
