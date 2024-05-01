@@ -47,14 +47,13 @@ jobs:
         id: check_service
         run: |
           service_name="${{ github.event.inputs.serviceName }}"
-          existing_service=$(gcloud run services list --platform=managed --format="value(SERVICE)" --filter="SERVICE=$service_name" 2>/dev/null || true)
-          echo $existing_service
-          if [[ -n "${existing_service}" ]]; then 
-            echo "Service with the Provided Name already Exist"
+          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+           echo "Service with the Provided Name already Exist"
             exit 0
           else 
             echo "Service with the Provided Name Does not Exist, Going to Create Service"
           fi
+          
           
       - name: Fetch env file from GCS
         run: |
