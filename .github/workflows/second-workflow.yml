@@ -82,13 +82,12 @@ jobs:
 
       - name: Update DNS Record
         run: |
-          RECORD_NAME="${{ inputs.domainName }}"
           RECORD_TYPE="CNAME"
           RECORD_VALUE="ghs.googlehosted.com."
           TTL="300"
       
           # Check if the record exists
-          existing_record=$(gcloud dns record-sets describe "$RECORD_NAME" --type="$RECORD_TYPE" --zone="$ZONE" --format="value(name)" 2>/dev/null)
+          existing_record=$(gcloud dns record-sets describe "${{ inputs.domainName }}" --type="$RECORD_TYPE" --zone="$ZONE" --format="value(name)" 2>/dev/null)
       
           if [[ "$existing_record" = "$RECORD_NAME." ]]; then
             echo "Record $RECORD_NAME already exists. Skipping."
