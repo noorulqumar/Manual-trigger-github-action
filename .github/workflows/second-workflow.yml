@@ -95,7 +95,7 @@ jobs:
             # If the record doesn't exist, add it
             echo "Adding record $RECORD_NAME..."
             gcloud dns record-sets transaction start --zone="$ZONE"
-            gcloud dns record-sets transaction add --zone="$ZONE" --name="$RECORD_NAME" --type="$RECORD_TYPE" --ttl="$TTL" "$RECORD_VALUE"
+            gcloud dns record-sets transaction add --zone="$ZONE" --name="${{ inputs.domainName }}" --type="$RECORD_TYPE" --ttl="$TTL" "$RECORD_VALUE"
             gcloud dns record-sets transaction execute --zone="$ZONE"
             echo "Record $RECORD_NAME added successfully."
           fi
