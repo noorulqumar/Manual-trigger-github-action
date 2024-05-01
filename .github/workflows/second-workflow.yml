@@ -77,8 +77,8 @@ jobs:
               --project $GOOGLE_PROJECT \
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
-              --allow-unauthenticated
-              --cpu=4 
+              --allow-unauthenticated \
+              --cpu=4 \
               --memory=16Gi
 
 
