@@ -41,7 +41,8 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
-          gcloud config set project qureos-a1006
+          gcloud config set project $GOOGLE_PROJECT
+          
       - name: Fetch env file from GCS
         run: |
           if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
@@ -60,8 +61,8 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
             gcloud run deploy ${{ inputs.serviceName }} \
-              --region europe-west1 \
-              --project qureos-a1006 \
+              --region europe-west1 \qureos-a1006
+              --project $GOOGLE_PROJECT \
               --image us-docker.pkg.dev/cloudrun/container/hello \
               --port 8080 \
               --allow-unauthenticated
@@ -69,7 +70,7 @@ jobs:
       - name: Update DNS Record
         run: |
             echo "Adding record $RECORD_NAME..."
-            gcloud config set project qureos-a1006
+            gcloud config set project $GOOGLE_PROJECT
             gcloud dns record-sets transaction start --zone="$ZONE"
             gcloud dns record-sets transaction add --zone="$ZONE" --name="${{ inputs.domainName }}" --type="CNAME" --ttl="300" "$RECORD_VALUE"
             gcloud dns record-sets transaction execute --zone="$ZONE"
@@ -77,7 +78,7 @@ jobs:
             
       - name: Get Service URL
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project qureos-a1006 --format 'value(status.url)')
+          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
           
      
