@@ -15,9 +15,7 @@ on:
       serviceName:
         description: 'CloudRun Service Name'
         required: true
-      domainName:
-        description: 'Domain Name'
-        required: true
+      
 jobs:
   Create:
     if: github.event.inputs.operationName == 'Create'
@@ -26,8 +24,7 @@ jobs:
       tag: $GITHUB_SHA
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      ZONE: "qureos-com"
-      RECORD_VALUE: "ghs.googlehosted.com."
+
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v2
@@ -88,5 +85,41 @@ jobs:
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
+
+  Delete:
+    if: github.event.inputs.operationName == 'Delete'
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Check Cloud Run service with provided name exists
+        id: check_service
+        run: |
+          service_name="${{ github.event.inputs.serviceName }}"
+          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+              echo "Service with the Provided Name Exist,Going to Delete It."
+              gcloud run services delete ${{ inputs.serviceName }} --platform managed --region europe-west1 --quiet
+          else 
+              echo "Service with the Provided Name Does not Exist"
+          fi
+          
+        
           
      
