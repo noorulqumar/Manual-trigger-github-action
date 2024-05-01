@@ -21,6 +21,7 @@ jobs:
       tag: $GITHUB_SHA
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+      TTL: "300"
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v2
