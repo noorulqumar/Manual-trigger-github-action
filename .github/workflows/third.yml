@@ -79,7 +79,8 @@ jobs:
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
-            --memory=16Gi
+            --memory=16Gi \
+            --vpc-connector prod-qureos
 
 
         
