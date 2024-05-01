@@ -82,7 +82,7 @@ jobs:
       - name: Update DNS Record
         run: |
           existing_record=$(gcloud dns record-sets describe "${{ inputs.domainName }}" --type="CNAME" --zone="$ZONE" --format="value(name)" 2>/dev/null)
-          if [[ "$existing_record" = "$RECORD_NAME." ]]; then
+          if [[ "$existing_record" = "${{ inputs.domainName }}" ]]; then
             echo "Record "${{ inputs.domainName }}" already exists. Skipping."
           else
             # If the record doesn't exist, add it
