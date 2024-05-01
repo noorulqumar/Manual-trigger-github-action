@@ -206,7 +206,7 @@ jobs:
           service_name="${{ github.event.inputs.serviceName }}"
           service_name+="-api-v3"
           echo "Service_Name=$service_name" >> $GITHUB_ENV 
-          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+          if gcloud run services list --platform=managed | grep -q "$Service_Name"; then
               echo "Service with the Provided Name Exist,Going to Delete It."
               gcloud run services delete ${{ inputs.serviceName }} --platform managed --region europe-west1 --quiet
           else 
