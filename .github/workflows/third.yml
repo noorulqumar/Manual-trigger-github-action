@@ -99,7 +99,7 @@ jobs:
             gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
-            --image europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
+            --image us-docker.pkg.dev/cloudrun/container/hello \ # europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
