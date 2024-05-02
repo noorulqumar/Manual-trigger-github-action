@@ -84,9 +84,9 @@ jobs:
 
       - name: Find the VPC Serverless Connector
         run: |
-          if [ "$GITHUB_REF_NAME" == "main" ]; then
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
             connector="prod-qureos-vpc-conector"
-          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
             connector="stg-qureos-vpc-conector"
           else
              connector="stg-1-qureos-vpc-conector"
@@ -121,6 +121,12 @@ jobs:
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
 
     steps:
+      - name: Verifying Branch of Deployment
+        run: |
+          if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
+            echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
+            exit 1
+          fi
       - name: 'Checkout code'
         uses: actions/checkout@v2
         
@@ -171,13 +177,14 @@ jobs:
 
       - name: Find the VPC Serverless Connector
         run: |
-          if [ "$GITHUB_REF_NAME" == "main" ]; then
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
             connector="prod-qureos-vpc-conector"
-          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
             connector="stg-qureos-vpc-conector"
           else
              connector="stg-1-qureos-vpc-conector"
           fi
+          
           echo "VPC-CONNECTOR=$connector" >> $GITHUB_ENV 
 
       - name: Deploy to Cloud Run
