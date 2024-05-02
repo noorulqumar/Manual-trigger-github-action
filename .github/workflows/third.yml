@@ -67,7 +67,7 @@ jobs:
 
       - name: Update SITE_URL in .env file
         run: |
-          sed -i "s|SITE_URL=.*|SITE_URL=https://${{ env.Service_Name }}-qureos-hbjcr5t7ia-ew.a.run.app|g" .env
+          sed -i "s|SITE_URL=.*|SITE_URL=https://${GITHUB_REF_NAME}-qureos-hbjcr5t7ia-ew.a.run.app|g" .env
           cat .env
           
       # - name: Build and Push Docker Image
