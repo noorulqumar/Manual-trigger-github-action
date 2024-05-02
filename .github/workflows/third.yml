@@ -47,8 +47,8 @@ jobs:
           service_name="${GITHUB_REF_NAME}-api-v3"
           echo "Service_Name=$service_name" >> $GITHUB_ENV 
           if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
-           echo "Service with the Provided Name already Exist"
-           exit 0
+           echo "A Service From the Provided Branch already Exist, So you can't Create it, If You Want to Update Please Update it"
+           exit 1
           else 
             echo "Service with the Provided Name Does not Exist, Going to Create Service"
           fi
@@ -136,9 +136,9 @@ jobs:
           echo "Service_Name=$service_name" >> $GITHUB_ENV 
           if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
            echo "Service with the Provided Name Exist, Going to Update it."
-           exit 0
           else 
-            echo "Service with the Provided Name Does not Exist"
+            echo "Service with the Provided Name Does not Exist, So Please Create It"
+            exit 1
           fi
           
           
