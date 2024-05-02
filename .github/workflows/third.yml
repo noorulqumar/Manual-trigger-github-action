@@ -99,12 +99,13 @@ jobs:
             gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
-            --image us-docker.pkg.dev/cloudrun/container/hello \ 
+            --image us-docker.pkg.dev/cloudrun/container/hello \
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
             --memory=16Gi \
-            --vpc-connector ${{ env.VPC-CONNECTOR }}
+            --vpc-connector prod-qureos-vpc-conector
+            
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
@@ -191,12 +192,12 @@ jobs:
             gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
-            --image us-docker.pkg.dev/cloudrun/container/hello}} \
+            --image us-docker.pkg.dev/cloudrun/container/hello \
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
             --memory=16Gi \
-            --vpc-connector ${{ env.VPC-CONNECTOR }}
+            --vpc-connector prod-qureos-vpc-conector
         
       - name: Get Service URL
         run: |
