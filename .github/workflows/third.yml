@@ -72,8 +72,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
-          docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }}
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
+          docker push europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }}
 
 
       - name: Find the VPC Serverless Connector
@@ -93,7 +93,7 @@ jobs:
             gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
-            --image europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }} \
+            --image europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
@@ -160,8 +160,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
-          docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }}
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
+          docker push europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }}
 
       - name: Find the VPC Serverless Connector
         run: |
@@ -179,7 +179,7 @@ jobs:
             gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
-            --image europe-west1-docker.pkg.dev/qureos-a1006/workflow/${{ env.Service_Name }}:${{ env.tag }} \
+            --image europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
             --port 8080 \
             --allow-unauthenticated \
             --cpu=4 \
