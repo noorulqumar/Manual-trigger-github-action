@@ -44,8 +44,7 @@ jobs:
       - name: Check Cloud Run service with provided name exists
         id: check_service
         run: |
-          service_name=$GITHUB_REF_NAME
-          service_name+="-api-v3"
+          service_name="${GITHUB_REF_NAME}-api-v3"
           echo "Service_Name=$service_name" >> $GITHUB_ENV 
           if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
            echo "Service with the Provided Name already Exist"
@@ -101,12 +100,11 @@ jobs:
             --memory=16Gi \
             --vpc-connector ${{ env.VPC-CONNECTOR }}
 
-
-        
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
+
 
   Update:
     if: github.event.inputs.operationName == 'Update'
@@ -134,12 +132,13 @@ jobs:
       - name: Check Cloud Run service with provided name exists
         id: check_service
         run: |
-          service_name="${{ github.event.inputs.serviceName }}"
-          if gcloud run services list --platform=managed | grep -q "$service_name"; then
-           echo "Service with the Provided Name already Exist"
+          service_name="${GITHUB_REF_NAME}-api-v3"
+          echo "Service_Name=$service_name" >> $GITHUB_ENV 
+          if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
+           echo "Service with the Provided Name Exist, Going to Update it."
            exit 0
           else 
-            echo "Service with the Provided Name Does not Exist, Going to Create Service"
+            echo "Service with the Provided Name Does not Exist"
           fi
           
           
@@ -158,9 +157,20 @@ jobs:
       #     docker build -t europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }} -f Dockerfile .
       #     docker push europe-west1-docker.pkg.dev/qureos-a1006/workflow/workflow:${{ env.tag }}
 
+      - name: Find the VPC Serverless Connector
+        run: |
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
+            connector="prod-qureos-vpc-conector"
+          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
+            connector="stg-qureos-vpc-conector"
+          else
+             connector="stg-1-qureos-vpc-conector"
+          fi
+          echo "VPC-CONNECTOR=$connector" >> $GITHUB_ENV 
+
       - name: Deploy to Cloud Run
         run: |
-            gcloud run deploy ${{ inputs.serviceName }} \
+            gcloud run deploy ${{ env.Service_Name }} \
             --region europe-west1 \
             --project $GOOGLE_PROJECT \
             --image us-docker.pkg.dev/cloudrun/container/hello \
@@ -168,14 +178,13 @@ jobs:
             --allow-unauthenticated \
             --cpu=4 \
             --memory=16Gi \
-            --vpc-connector prod-qureos-vpc-conector
-
-
+            --vpc-connector ${{ env.VPC-CONNECTOR }}
         
       - name: Get Service URL
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ inputs.serviceName }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
+          SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
           echo "Service URL: $SERVICE_URL"
+
           
   Delete:
     if: github.event.inputs.operationName == 'Delete'
