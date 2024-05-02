@@ -1,0 +1,231 @@
+name: 3rd Manual Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      operationName:
+        type: choice
+        description: 'Select Operation' 
+        options: ["Create", "Update", "Delete"]
+      secretName:
+        type: choice
+        description: 'Select Secret Name' 
+        options: ["api-v3-prod", "api-v3-stg-1", "api-v3-stg"]
+
+      # serviceName:
+      #   description: 'CloudRun Service Name'
+      #   required: true
+      #   default: $GITHUB_REF_NAME
+      
+jobs:
+  Create:
+    if: github.event.inputs.operationName == 'Create'
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Check Cloud Run service with provided name exists
+        id: check_service
+        run: |
+          service_name="${GITHUB_REF_NAME}-api-v3"
+          echo "Service_Name=$service_name" >> $GITHUB_ENV 
+          if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
+           echo "A Service From the Provided Branch already Exist, So you can't Create it, If You Want to Update Please Update it"
+           exit 1
+          else 
+            echo "Service with the Provided Name Does not Exist, Going to Create Service"
+          fi
+          
+          
+      - name: Fetch env file from GCS
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            gsutil cp gs://qureos-envs/backend/prod/.env .
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            gsutil cp gs://qureos-envs/backend/staging/.env .
+          else
+             gsutil cp gs://qureos-envs/backend/stg-1/.env .
+          fi
+
+      - name: Update SITE_URL in .env file
+        run: |
+          sed -i "s|SITE_URL=.*|SITE_URL=https://${GITHUB_REF_NAME}-qureos-hbjcr5t7ia-ew.a.run.app|g" .env
+          cat .env
+          
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
+          docker push europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }}
+
+
+      - name: Find the VPC Serverless Connector
+        run: |
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
+            connector="prod-qureos-vpc-conector"
+          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
+            connector="stg-qureos-vpc-conector"
+          else
+             connector="stg-1-qureos-vpc-conector"
+          fi
+          
+          echo "VPC-CONNECTOR=$connector" >> $GITHUB_ENV 
+
+      - name: Deploy to Cloud Run
+        run: |
+            gcloud run deploy ${{ env.Service_Name }} \
+            --region europe-west1 \
+            --project $GOOGLE_PROJECT \
+            --image europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
+            --port 8080 \
+            --allow-unauthenticated \
+            --cpu=4 \
+            --memory=16Gi \
+            --vpc-connector ${{ env.VPC-CONNECTOR }}
+
+      - name: Get Service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+
+
+  Update:
+    if: github.event.inputs.operationName == 'Update'
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Check Cloud Run service with provided name exists
+        id: check_service
+        run: |
+          service_name="${GITHUB_REF_NAME}-api-v3"
+          echo "Service_Name=$service_name" >> $GITHUB_ENV 
+          if gcloud run services list --platform=managed | grep -q ${{ env.Service_Name }}; then
+           echo "Service with the Provided Name Exist, Going to Update it."
+          else 
+            echo "Service with the Provided Name Does not Exist, So Please Create It"
+            exit 1
+          fi
+          
+          
+      - name: Fetch env file from GCS
+        run: |
+          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
+            gsutil cp gs://qureos-envs/backend/prod/.env .
+          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
+            gsutil cp gs://qureos-envs/backend/staging/.env .
+          else
+             gsutil cp gs://qureos-envs/backend/stg-1/.env .
+          fi
+
+      - name: Update SITE_URL in .env file
+        run: |
+          sed -i "s|SITE_URL=.*|SITE_URL=https://${GITHUB_REF_NAME}-qureos-hbjcr5t7ia-ew.a.run.app|g" .env
+          cat .env
+          
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build -t europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} -f Dockerfile .
+          docker push europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }}
+
+      - name: Find the VPC Serverless Connector
+        run: |
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
+            connector="prod-qureos-vpc-conector"
+          elif [ "$GITHUB_REF_NAME" == "stg" ]; then
+            connector="stg-qureos-vpc-conector"
+          else
+             connector="stg-1-qureos-vpc-conector"
+          fi
+          echo "VPC-CONNECTOR=$connector" >> $GITHUB_ENV 
+
+      - name: Deploy to Cloud Run
+        run: |
+            gcloud run deploy ${{ env.Service_Name }} \
+            --region europe-west1 \
+            --project $GOOGLE_PROJECT \
+            --image europe-west1-docker.pkg.dev/qureos-a1006/manual-workflow/${{ env.Service_Name }}:${{ env.tag }} \
+            --port 8080 \
+            --allow-unauthenticated \
+            --cpu=4 \
+            --memory=16Gi \
+            --vpc-connector ${{ env.VPC-CONNECTOR }}
+        
+      - name: Get Service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+
+          
+  Delete:
+    if: github.event.inputs.operationName == 'Delete'
+    runs-on: ubuntu-20.04
+    env:
+      tag: $GITHUB_SHA
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          
+      - name: Authenticate With Google Cloud Using Service Account Key
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
+          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud config set project $GOOGLE_PROJECT
+
+      - name: Check and Delete Cloud Run service if exists
+        run: |
+          service_name="${GITHUB_REF_NAME}-api-v3"
+          if gcloud run services list --platform=managed | grep -q "$service_name"; then
+              echo "Service with the Provided Name Exist, Going to Delete It."
+              gcloud run services delete $service_name --platform managed --region europe-west1 --quiet
+          else 
+              echo "Service with the Provided Name Does not Exist"
+          fi
+
+          
+        
+          
+     
