@@ -202,7 +202,7 @@ jobs:
 
       - name: Check and Delete Cloud Run service if exists
         run: |
-          service_name="$GITHUB_REF_NAME-api-v3"
+          service_name="${GITHUB_REF_NAME}-api-v3"
           if gcloud run services list --platform=managed | grep -q "$service_name"; then
               echo "Service with the Provided Name Exist, Going to Delete It."
               gcloud run services delete $service_name --platform managed --region europe-west1 --quiet
