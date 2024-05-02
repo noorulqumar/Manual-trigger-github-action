@@ -1,4 +1,4 @@
-name: 3rd Manual Workflow
+name: Deploying On-demand-${GITHUB_REF_NAME}
 
 on:
   workflow_dispatch:
