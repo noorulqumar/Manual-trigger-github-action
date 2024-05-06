@@ -7,6 +7,9 @@ on:
         type: choice
         description: 'Select Operation' 
         options: ["Create", "Update", "Delete"]
+      boolean:
+        type: boolean
+        description: True or False
       secretName:
         type: choice
         description: 'Select Secret Name' 
