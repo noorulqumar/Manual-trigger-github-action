@@ -49,12 +49,19 @@ jobs:
         with:
           version: 'latest'
           
-      - name: Authenticate With Google Cloud Using Service Account Key
-        run: |
-          echo $GOOGLE_APPLICATION_CREDENTIALS > /tmp/keyfile.json
-          cat /tmp/keyfile.json
-          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
-          gcloud config set project $GOOGLE_PROJECT  
+      # - name: Authenticate With Google Cloud Using Service Account Key
+      #   run: |
+      #     echo $GOOGLE_APPLICATION_CREDENTIALS > /tmp/keyfile.json
+      #     cat /tmp/keyfile.json
+      #     gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+      #     gcloud config set project $GOOGLE_PROJECT  
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          project_id: ${{ secrets.GOOGLE_PROJECT }}
+          export_default_credentials: true
 
       - name: Check Cloud Run service with provided name exists
         id: check_service
