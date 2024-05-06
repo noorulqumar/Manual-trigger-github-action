@@ -8,8 +8,9 @@ on:
         description: 'Select Operation' 
         options: ["Create", "Update", "Delete"]
       boolean:
-        type: boolean
-        description: True or False
+        type: choice
+        description: 'Want to Run Test' 
+        options: ["Yes", "No"]
       secretName:
         type: choice
         description: 'Select Secret Name' 
