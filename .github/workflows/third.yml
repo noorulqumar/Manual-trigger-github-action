@@ -109,7 +109,13 @@ jobs:
             --cpu=4 \
             --memory=16Gi \
             --vpc-connector prod-qureos-vpc-conector
-            
+
+
+      - name: Update SITE_URL in .env file
+        if: env.RUN_TEST == 'true'
+        run: |
+          cat .env
+  
       - name: Get Service URL
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.Service_Name }} --region europe-west1 --project $GOOGLE_PROJECT --format 'value(status.url)')
