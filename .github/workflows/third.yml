@@ -31,12 +31,12 @@ jobs:
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
 
     steps:
-      - name: Verifying Branch of Deployment
-        run: |
-          if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
-            echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
-            exit 1
-          fi
+      # - name: Verifying Branch of Deployment
+      #   run: |
+      #     if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
+      #       echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
+      #       exit 1
+      #     fi
       - name: 'Checkout code'
         uses: actions/checkout@v2
         
@@ -111,7 +111,7 @@ jobs:
             --vpc-connector prod-qureos-vpc-conector
 
 
-      - name: Update SITE_URL in .env file
+      - name: Update _URL in .env file
         if: env.RUN_TEST == 'true'
         run: |
           cat .env
