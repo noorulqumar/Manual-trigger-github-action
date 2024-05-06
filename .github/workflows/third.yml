@@ -35,11 +35,11 @@ jobs:
         if: inputs.boolean == 'Yes'
         run: |
           echo "No"
-      - name: Verifying Branch of Deployment
-        run: |
-          if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
-            echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
-            exit 1
+      # - name: Verifying Branch of Deployment
+      #   run: |
+      #     if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
+      #       echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
+      #       exit 1
           fi
       - name: 'Checkout code'
         uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
       - name: Authenticate With Google Cloud Using Service Account Key
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /tmp/keyfile.json
-          gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
           gcloud config set project $GOOGLE_PROJECT  
 
       - name: Check Cloud Run service with provided name exists
