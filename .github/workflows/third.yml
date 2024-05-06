@@ -7,14 +7,15 @@ on:
         type: choice
         description: 'Select Operation' 
         options: ["Create", "Update", "Delete"]
-      boolean:
-        type: choice
-        description: 'Want to Run Test?' 
-        options: ["Yes", "No"]
       secretName:
         type: choice
         description: 'Select Secret Name' 
         options: ["api-v3-prod", "api-v3-stg-1", "api-v3-stg"]
+
+     boolean:
+        type: choice
+        description: 'Want to Run Test?' 
+        options: ["Yes", "No"]
 
       # serviceName:
       #   description: 'CloudRun Service Name'
