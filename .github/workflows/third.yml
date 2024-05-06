@@ -51,8 +51,8 @@ jobs:
           
       - name: Authenticate With Google Cloud Using Service Account Key
         run: |
-          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} 
-          # > /tmp/keyfile.json
+          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} > /tmp/keyfile.json
+          cat /tmp/keyfile.json
           gcloud auth activate-service-account --key-file=/tmp/keyfile.json
           gcloud config set project $GOOGLE_PROJECT  
 
