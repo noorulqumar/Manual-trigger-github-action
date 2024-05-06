@@ -9,7 +9,7 @@ on:
         options: ["Create", "Update", "Delete"]
       boolean:
         type: choice
-        description: 'Want to Run Test' 
+        description: 'Want to Run Test?' 
         options: ["Yes", "No"]
       secretName:
         type: choice
