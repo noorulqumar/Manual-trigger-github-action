@@ -31,12 +31,16 @@ jobs:
       GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
 
     steps:
-      # - name: Verifying Branch of Deployment
-      #   run: |
-      #     if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
-      #       echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
-      #       exit 1
-      #     fi
+      - name: Update _URL in .env file
+        if: env.RUN_TEST == 'true'
+        run: |
+          echo "No"
+      - name: Verifying Branch of Deployment
+        run: |
+          if [ "$GITHUB_REF_NAME" == "main" ] || [ "$GITHUB_REF_NAME" == "stg-1" ] || [ "$GITHUB_REF_NAME" == "stg" ]; then
+            echo "You can't trigger the Manual workflow form $GITHUB_REF_NAME Branch, Please carefully Selsct Your Brnach"
+            exit 1
+          fi
       - name: 'Checkout code'
         uses: actions/checkout@v2
         
