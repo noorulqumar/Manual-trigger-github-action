@@ -44,10 +44,10 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v2
         
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-        with:
-          version: 'latest'
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v2'
+      #   with:
+      #     version: 'latest'
           
       # - name: Authenticate With Google Cloud Using Service Account Key
       #   run: |
