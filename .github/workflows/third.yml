@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Update _URL in .env file
-        if: env.RUN_TEST == 'true'
+        if: inputs.boolean == "Yes"
         run: |
           echo "No"
       - name: Verifying Branch of Deployment
