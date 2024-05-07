@@ -76,15 +76,9 @@ jobs:
           fi
           
           
-      - name: Fetch env file from GCS
+      - name: Fetch secret from Secret Manager
         run: |
-          if [ "${{ inputs.secretName }}" == "api-v3-prod" ]; then
-            gsutil cp gs://qureos-envs/backend/prod/.env .
-          elif [ "${{ inputs.secretName }}" == "api-v3-stg" ]; then
-            gsutil cp gs://qureos-envs/backend/staging/.env .
-          else
-             gsutil cp gs://qureos-envs/backend/stg-1/.env .
-          fi
+             gcloud secrets versions access latest --secret=${{ inputs.secretName }} --project=${{ secrets.GOOGLE_PROJECT }} --format="get(payload.data)" | base64 -d > .env
 
       - name: Update SITE_URL in .env file
         run: |
