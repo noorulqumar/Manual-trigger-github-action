@@ -4,6 +4,9 @@ on:
   release:
     types: [created]
 
+permissions:
+  issues: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
