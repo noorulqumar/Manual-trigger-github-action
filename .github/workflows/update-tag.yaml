@@ -1,0 +1,50 @@
+name: Update STAGEVERSION
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Update STAGEVERSION
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<EOF
+          import subprocess
+          import json
+          
+          gh_command = ["gh", "api", "repos/kabayanremit/pyco/actions/variables/STAGEVERSION", "--method", "GET"]
+          result = subprocess.run(gh_command, capture_output=True, text=True)
+          stage_version = json.loads(result.stdout)["value"]
+          
+          print(stage_version)
+          
+          version = stage_version.lstrip('v')
+          version_parts = list(map(int, version.split('.')))
+          patch_version = version_parts[2] + 1
+          
+          new_version = f"v{version_parts[0]}.{version_parts[1]}.{patch_version}"
+          print(f"New version: {new_version}")
+          
+          update_command = [
+              "gh", "api", "-X", "PATCH",
+              "repos/kabayanremit/pyco/actions/variables/STAGEVERSION",
+              "-f", f"value={new_version}"
+          ]
+          subprocess.run(update_command)
+          EOF
