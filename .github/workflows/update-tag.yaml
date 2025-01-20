@@ -2,7 +2,9 @@ name: Update STAGEVERSION
 
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow
-
+permissions:
+  contents: read
+  actions: write
 
 jobs:
   update-version:
