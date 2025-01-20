@@ -21,7 +21,10 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install requests
+          echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" > ~/.git-credentials
+          git config --global credential.helper store
 
       - name: Update STAGEVERSION
         env:
