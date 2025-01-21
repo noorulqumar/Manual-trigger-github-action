@@ -14,21 +14,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: |
-          pip install requests
           
 
-      - name: Update STAGEVERSION
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Image Version
         run: |
-          echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" > ~/.git-credentials
-          git config --global credential.helper store
-          python3 test.py
+          echo $GITHUB_REPOSITORY
+          python3 .github/workflows/versionScript/versioning-script.py $GITHUB_REPOSITORY
